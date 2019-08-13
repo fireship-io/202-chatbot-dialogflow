@@ -1,39 +1,31 @@
 const functions = require('firebase-functions');
+const cors = require('cors')({ origin: true});
 const admin = require('firebase-admin');
-const acct = require('./service-account.json')
+const serviceAccount = require('./service-account.json');
+
 admin.initializeApp({
-credential: admin.credential.cert(acct),
-databaseURL: "https://fireship-lessons.firebaseio.com"
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://fireship-lessons.firebaseio.com"
 });
 
 const { SessionsClient } = require('dialogflow');
 
 
-
-
-exports.dialogflowGateway = functions.https.onRequest(async (request, response) => {
-
+exports.dialogflowGateway = functions.https.onRequest((request, response) => {
+  cors(request, response, async () => {
     const { queryInput, sessionId } = request.body;
 
- 
 
     const sessionClient = new SessionsClient({ credentials: acct });
     const session = sessionClient.sessionPath('fireship-lessons', sessionId);
 
 
+    const responses = await sessionClient.detectIntent({ session, queryInput});
 
-      const responses = await sessionClient.detectIntent({ session, queryInput});
-      console.log('Detected intent');
-      const result = responses[0].queryResult;
-      console.log(`  Query: ${result.queryText}`);
-      console.log(`  Response: ${result.fulfillmentText}`);
-      if (result.intent) {
-        console.log(`  Intent: ${result.intent.displayName}`);
-      } else {
-        console.log(`  No intent matched.`);
-      }
+    const result = responses[0].queryResult;
 
     response.send(result);
+  });
 });
 
 
@@ -51,8 +43,7 @@ exports.dialogflowWebhook = functions.https.onRequest(async (request, response) 
     }
    
     function fallback(agent) {
-      agent.add(`I didn't understand`);
-      agent.add(`I'm sorry, can you try again?`);
+      agent.add(`Sorry, can you try again?`);
     }
 
     async function userOnboardingHandler(agent) {
@@ -71,6 +62,5 @@ exports.dialogflowWebhook = functions.https.onRequest(async (request, response) 
     intentMap.set('Default Welcome Intent', welcome);
     intentMap.set('Default Fallback Intent', fallback);
     intentMap.set('UserOnboarding', userOnboardingHandler);
-    // intentMap.set('your intent name here', googleAssistantHandler);
     agent.handleRequest(intentMap);
 });
