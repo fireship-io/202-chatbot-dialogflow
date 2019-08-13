@@ -16,7 +16,7 @@ exports.dialogflowGateway = functions.https.onRequest((request, response) => {
     const { queryInput, sessionId } = request.body;
 
 
-    const sessionClient = new SessionsClient({ credentials: acct });
+    const sessionClient = new SessionsClient({ credentials: serviceAccount });
     const session = sessionClient.sessionPath('fireship-lessons', sessionId);
 
 
