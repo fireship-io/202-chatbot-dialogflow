@@ -8,6 +8,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NbThemeModule, NbLayoutModule, NbChatModule, NbSpinnerModule } from '@nebular/theme';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
 import { ChatbotComponent } from './chatbot/chatbot.component';
+import { Platform } from '@angular/cdk/platform';
 
 
 @NgModule({
@@ -26,7 +27,7 @@ import { ChatbotComponent } from './chatbot/chatbot.component';
     NbSpinnerModule,
     HttpClientModule
   ],
-  providers: [],
+  providers: [Platform],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
